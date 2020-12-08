@@ -8,7 +8,12 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
 
 function generateRandomString() {
- return Math.random().toString(36).substr(2, 5);
+  const charStr = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  let alphaNum = '';
+  for (let i = 0; i < 6; i++) {
+    alphaNum += charStr.charAt(Math.floor(Math.random() * charStr.length));
+  }
+  return alphaNum;
 }
 
 const urlDatabase = {
@@ -16,48 +21,64 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
-app.get("/", (req, res) => {
-  res.send("Hello!");
-});
+// app.get("/", (req, res) => {
+//   res.send("Hello!");
+// });
 
+// Render the main page of URLs
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars);
 });
 
-app.post("/urls", (req, res) => {
-  const newShortURL = generateRandomString();
-  urlDatabase[newShortURL] = req.body['longURL'];
-  res.redirect(`/urls/${newShortURL}`);
-});
-
+// Render page for creating a new shortURL
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
-app.post("/urls/:shortURL/delete", (req, res) => {
-  delete urlDatabase[req.params.shortURL];
-  res.redirect("/urls");
-});
-
+// Render page for the shortURL
 app.get("/urls/:shortURL", (req, res) => {
   const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
   res.render("urls_show", templateVars);
 });
 
+// Redirect to actual webpage upon clicking on shortURL
 app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL];
-  // console.log(longURL);
   res.redirect(longURL);
 });
 
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
+// Create a new shortURL for a longURL
+app.post("/urls", (req, res) => {
+  const newShortURL = generateRandomString();
+  urlDatabase[newShortURL] = req.body.longURL;
+  res.redirect(`/urls/${newShortURL}`);
 });
 
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
+// Delete existing shortURL: longURL
+app.post("/urls/:shortURL/delete", (req, res) => {
+  delete urlDatabase[req.params.shortURL];
+  res.redirect("/urls");
 });
+
+// Redirect to shortURL page upon clicking Edit button from main URLs page
+app.post("/urls/:shortURL/edit", (req, res) => {
+  res.redirect(`/urls/${req.params.shortURL}`);
+});
+
+// Edit existing shortURL
+app.post("/urls/:id", (req, res) => {
+  urlDatabase[req.params.id] = req.body.longURL;
+  res.redirect("/urls");
+});
+
+// app.get("/urls.json", (req, res) => {
+//   res.json(urlDatabase);
+// });
+
+// app.get("/hello", (req, res) => {
+//   res.send("<html><body>Hello <b>World</b></body></html>\n");
+// });
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);

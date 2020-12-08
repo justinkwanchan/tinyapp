@@ -56,3 +56,10 @@
 
 ## Updating URLs
 
+1. In urls_show.ejs, add a form that submits an updated long URL
+    * Submit using method: POST
+    * Action: /urls/:id
+2. Route for /urls/:id - method: POST
+    * Assign a new longURL to the existing shortURL
+    * Redirect to "/urls"
+3. In urls_index.ejs, add an additional column of edit buttons (similar to the delete buttons)
