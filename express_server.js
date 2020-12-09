@@ -30,32 +30,45 @@ const urlDatabase = {
   "9sm5xK": { longURL: "http://www.google.com", userID: "a22" }
 };
 
-const users = { 
+const users = {
   "userRandomID": {
-    id: "userRandomID", 
-    email: "user@example.com", 
+    id: "userRandomID",
+    email: "user@example.com",
     password: "purple-monkey-dinosaur"
   },
   "a22": {
-    id: "a22", 
-    email: "a@t.com", 
+    id: "a22",
+    email: "a@t.com",
     password: "pass"
   }
 };
 
+// Checks to see if given email exists in users object
 const emailExists = email => {
   for (let user in users) {
     if (users[user].email === email) return true;
   }
   return false;
-}
+};
 
+// Returns the user's id associated with their email
 const idByEmail = email => {
   for (let user in users) {
     if (users[user].email === email) return users[user].id;
   }
   return null;
-}
+};
+
+// Returns an object  containing only the URL objects associated with a particular user ID
+const urlsForUser = id => {
+  let returnObj = {};
+  for (let key in urlDatabase) {
+    if (urlDatabase[key].userID === id) {
+      returnObj[key] = urlDatabase[key];
+    }
+  }
+  return returnObj;
+};
 
 // app.get("/", (req, res) => {
 //   res.send("Hello!");
@@ -64,8 +77,10 @@ const idByEmail = email => {
 // Render the main page of URLs
 app.get("/urls", (req, res) => {
   // console.log(JSON.stringify(urlDatabase, null, 2));
+  console.log(urlsForUser(req.cookies.user_id));
+  console.log('=============');
   const templateVars = {
-    urls: urlDatabase,
+    urls: urlsForUser(req.cookies.user_id),
     user_id: users[req.cookies.user_id]
   };
   res.render("urls_index", templateVars);
@@ -155,7 +170,7 @@ app.post("/login", (req, res) => {
     res.status(403).send('<h2>403 - Email does not exist</h2>');
   } else if (users[userID].password !== req.body.password) {
     res.status(403).send('<h2>403 - Password does not match</h2>');
-  } else{
+  } else {
     res.cookie('user_id', userID);
     res.redirect("/urls");
   }
@@ -180,8 +195,8 @@ app.post("/register", (req, res) => {
   } else {
     const newID = generateRandomString();
     users[newID] = {
-      id: newID, 
-      email: req.body.email, 
+      id: newID,
+      email: req.body.email,
       password: req.body.password
     };
     res.cookie('user_id', newID);

@@ -139,3 +139,13 @@
     * Change urlDatabase so the values are objects containing the longURL and associated userID
 3. Anyone Can Visit Short URLs
     * Test your GET /u/:id routes to make sure they redirect for users, even if they aren't logged in.
+
+## More Permission Features
+
+1. Users Can Only See Their Own Shortened URLs
+    * /urls only displays URLs if user is logged in
+    * /urls/:shortURL displays message instead of edit form if not logged in
+    * Create urlsForUser(id) function
+2. Users Can Only Edit or Delete Their Own URLs
+    * Update the edit and delete endpoints
+    * Use curl "-X POST -i localhost:8080/urls/sgq3y6/delete" to test
