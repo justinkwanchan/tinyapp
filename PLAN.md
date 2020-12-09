@@ -94,3 +94,12 @@
       * If present, display username and a logout button which POSTs to /logout
     * Implement the /logout endpoint so that it clears the username cookie and redirects the user back to the /urls page
       * clearCookie function in express
+
+## User Registration Form
+
+1. Developed on the new feature/user-registration git branch
+2. Create registration form with email and password fields
+3. Create GET /register endpoint
+
+## Registering New Users
+
