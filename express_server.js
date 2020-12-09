@@ -10,14 +10,14 @@ app.use(cookieParser());
 
 app.set("view engine", "ejs");
 
-function generateRandomString() {
+const generateRandomString = function() {
   const charStr = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
   let alphaNum = '';
   for (let i = 0; i < 6; i++) {
     alphaNum += charStr.charAt(Math.floor(Math.random() * charStr.length));
   }
   return alphaNum;
-}
+};
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -59,6 +59,14 @@ app.get("/urls/:shortURL", (req, res) => {
 app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL];
   res.redirect(longURL);
+});
+
+// Render the registration page
+app.get("/register", (req, res) => {
+  const templateVars = {
+    username: req.cookies.username
+  };
+  res.render("register", templateVars);
 });
 
 // Create a new shortURL for a longURL
