@@ -6,8 +6,10 @@
   * app.get("/urls/:shortURL) => Renders page of shortURL
   * app.get("/u/:shortURL)    => Redirects clicks on a shortURL to longURL webpage
 * Method = POST
-  * app.post("urls")          => Create new shortURL
+  * app.post("urls")                  => Create new shortURL
   * app.post("urls/:shortURL/delete)  => Delete shortURL
+  * app.post("/urls/:shortURL/edit")  =>
+  * app.post("/urls/:id")             => 
 
 # Templates
 
@@ -63,3 +65,32 @@
     * Assign a new longURL to the existing shortURL
     * Redirect to "/urls"
 3. In urls_index.ejs, add an additional column of edit buttons (similar to the delete buttons)
+
+## Cookies in Express
+
+1. The Login Form
+    * Create a form in _header.ejs that POSTs to /login
+      * a single text input with name="username"
+      * a submit button to submit the form
+      * Users will type in any username into this form in order to "sign in" for now.
+    * ***There is a picture example at the bottom of the page
+
+2. The Login Route
+    * Create an endpoint (route) to handle a POST to /login
+    * Create a new key: value pair (username: value) in res.cookie
+    * Redirect back to /urls
+
+3. Test the Login
+    * From the terminal
+      * curl -X POST -i localhost:8080/login -d "username=vanillaice"
+        * The -d flag is used to send form data in the same way a browser would when submitting our login form.
+
+4. Display the Username
+    * Pass in the username to all views that include the _header.ejs partial and modify the _header.ejs partial to display the passed-in username next to the form.
+
+5. Implement Logout Client & Server logic
+    * Once the user is logged in, the form should instead display the username and contain just a Log Out button:
+    * _header.ejs should check to see if a username is present
+      * If present, display username and a logout button which POSTs to /logout
+    * Implement the /logout endpoint so that it clears the username cookie and redirects the user back to the /urls page
+      * clearCookie function in express
