@@ -129,3 +129,13 @@
     * Need to send the appropriate user_id to cookies if login attempt is successful
     * Return a 403 message if email does not exist or password is incorrect
     * Redirect to /urls
+3. Merge feature/user-registration git branch into master
+
+## Basic Permission Features
+
+1. Only Registered Users Can Shorten URLs
+    * If someone is not logged in when trying to access /urls/new, redirect them to the login page.
+2. URLs Belong to Users
+    * Change urlDatabase so the values are objects containing the longURL and associated userID
+3. Anyone Can Visit Short URLs
+    * Test your GET /u/:id routes to make sure they redirect for users, even if they aren't logged in.
