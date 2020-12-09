@@ -153,8 +153,14 @@ app.post("/urls/:shortURL/edit", (req, res) => {
 
 // Edit existing shortURL
 app.post("/urls/:id", (req, res) => {
-  urlDatabase[req.params.id].longURL = req.body.longURL;
-  res.redirect("/urls");
+  console.log(req.cookies.user_id)
+  console.log(urlDatabase[req.params.id].userID)
+  if (req.cookies.user_id === urlDatabase[req.params.id].userID) {
+    urlDatabase[req.params.id].longURL = req.body.longURL;
+    res.redirect("/urls");
+  } else {
+    res.status(403).send('<h2>403 - Access is forbidden</h2>');
+  }
 });
 
 /**
