@@ -1,3 +1,9 @@
+/**
+ * W03 - TinyApp Project
+ * - Allows user to submit a URL, after which a shortened URL is generated
+ * - Allows users to register an email and password for logging in
+ */
+
 const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
@@ -29,13 +35,15 @@ const users = {
     id: "userRandomID", 
     email: "user@example.com", 
     password: "purple-monkey-dinosaur"
-  },
- "user2RandomID": {
-    id: "user2RandomID", 
-    email: "user2@example.com", 
-    password: "dishwasher-funk"
   }
 };
+
+const emailExists = email => {
+  for (let user in users) {
+    if (users[user].email === email) return true;
+  }
+  return false;
+}
 
 // app.get("/", (req, res) => {
 //   res.send("Hello!");
@@ -118,16 +126,25 @@ app.post("/logout", (req, res) => {
   res.redirect("/urls");
 });
 
-// Creates new user in the users object
+/**
+ * Creates new user in the users object
+ * Sends a response code of 400 if either field is left empty
+ */
 app.post("/register", (req, res) => {
-  const newID = generateRandomString();
-  users[newID] = {
-    id: newID, 
-    email: req.body.email, 
-    password: req.body.password
-  };
-  res.cookie('user_id', newID);
-  res.redirect("/urls");
+  if (!req.body.email || !req.body.password) {
+    res.status(400).send('<h2>400 - Email or password left empty</h2>');
+  } else if (emailExists(req.body.email)) {
+    res.status(400).send('<h2>400 - Email is taken</h2>');
+  } else {
+    const newID = generateRandomString();
+    users[newID] = {
+      id: newID, 
+      email: req.body.email, 
+      password: req.body.password
+    };
+    res.cookie('user_id', newID);
+    res.redirect("urls");
+  }
 });
 
 // app.get("/urls.json", (req, res) => {
