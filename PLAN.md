@@ -118,3 +118,14 @@
 
 ## A New Login Page
 
+1. Still on feature/user-registration git branch
+2. Create a login template and GET route
+3. In _header.ejs, remove the login form and replace it with login and register buttons
+
+## Refactoring the Login Route
+
+1. Still on feature/user-registration git branch
+2. Modify the POST /login route
+    * Need to send the appropriate user_id to cookies if login attempt is successful
+    * Return a 403 message if email does not exist or password is incorrect
+    * Redirect to /urls

@@ -35,6 +35,11 @@ const users = {
     id: "userRandomID", 
     email: "user@example.com", 
     password: "purple-monkey-dinosaur"
+  },
+  "a22": {
+    id: "a22", 
+    email: "a@t.com", 
+    password: "pass"
   }
 };
 
@@ -43,6 +48,13 @@ const emailExists = email => {
     if (users[user].email === email) return true;
   }
   return false;
+}
+
+const idByEmail = email => {
+  for (let user in users) {
+    if (users[user].email === email) return users[user].id;
+  }
+  return null;
 }
 
 // app.get("/", (req, res) => {
@@ -90,6 +102,14 @@ app.get("/register", (req, res) => {
   res.render("register", templateVars);
 });
 
+// Render the login page
+app.get("/login", (req, res) => {
+  const templateVars = {
+    user_id: users[req.cookies.user_id]
+  };
+  res.render("login", templateVars);
+});
+
 // Create a new shortURL for a longURL
 app.post("/urls", (req, res) => {
   const newShortURL = generateRandomString();
@@ -114,10 +134,23 @@ app.post("/urls/:id", (req, res) => {
   res.redirect("/urls");
 });
 
-// Login the user
+/**
+ * Logs in the user if the email exists and the password matches
+ * Sends a response code of 403 if email does not exist
+ * Sends a response code of 403 if email exists and password does not match
+ */
 app.post("/login", (req, res) => {
-  res.cookie('user_id', req.body.user_id);
-  res.redirect("/urls");
+  const userID = idByEmail(req.body.email);
+  if (!req.body.email || !req.body.password) {
+    res.status(400).send('<h2>400 - Email or password left empty</h2>');
+  } else if (!emailExists(req.body.email)) {
+    res.status(403).send('<h2>403 - Email does not exist</h2>');
+  } else if (users[userID].password !== req.body.password) {
+    res.status(403).send('<h2>403 - Password does not match</h2>');
+  } else{
+    res.cookie('user_id', userID);
+    res.redirect("/urls");
+  }
 });
 
 // Log out the user
@@ -129,6 +162,7 @@ app.post("/logout", (req, res) => {
 /**
  * Creates new user in the users object
  * Sends a response code of 400 if either field is left empty
+ * Sends a response code of 400 if email is already taken
  */
 app.post("/register", (req, res) => {
   if (!req.body.email || !req.body.password) {
