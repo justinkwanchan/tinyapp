@@ -103,3 +103,7 @@
 
 ## Registering New Users
 
+1. Create a users object
+2. Upon submission of data on the registration page, generate a new user ID and insert it and the user information into the users object
+3. Update all views to pass the user object rather than the username
+4. Pass the user object to _header and display user's email in header
