@@ -77,9 +77,6 @@ const urlsForUser = id => {
 
 // Render the main page of URLs
 app.get("/urls", (req, res) => {
-  // console.log(JSON.stringify(urlDatabase, null, 2));
-  console.log(urlsForUser(req.cookies.user_id));
-  console.log('=============');
   const templateVars = {
     urls: urlsForUser(req.cookies.user_id),
     user_id: users[req.cookies.user_id]
@@ -143,9 +140,7 @@ app.post("/urls", (req, res) => {
 
 // Delete existing shortURL: longURL
 app.post("/urls/:shortURL/delete", (req, res) => {
-  if (!urlDatabase[req.params.shortURL]) {
-    res.status(403).send('<h2>403 - Access is forbidden and the URL does not exist anyway</h2>');
-  } else if (req.cookies.user_id === urlDatabase[req.params.shortURL].userID) {
+  if (req.cookies.user_id === urlDatabase[req.params.shortURL].userID) {
     delete urlDatabase[req.params.shortURL];
     res.redirect("/urls");
   } else {
