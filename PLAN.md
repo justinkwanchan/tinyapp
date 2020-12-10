@@ -182,3 +182,5 @@
     * Put functions in here and export them
 3. Mocha and Chai
     * Begin by testing getUserByEmail function
+      * Test the happy path
+      * Test to see that the function returns undefined if the email is nonexistent
