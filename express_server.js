@@ -2,6 +2,11 @@
  * W03 - TinyApp Project
  * - Allows user to submit a URL, after which a shortened URL is generated
  * - Allows users to register an email and password for logging in
+ * - Shortened URLs are only visible to the user who created them, but usable by anyone with the link
+ * - Shortened URLs can only be deleted or edited by the person who created them
+ * - Passwords are secure through hashing
+ * - Cookies are encrypted
+ * - Application supports mobile use (resizes to fit narrower screens)
  */
 
 const express = require("express");
@@ -18,7 +23,6 @@ app.use(cookieSession({
   keys: ['key1']
 }));
 
-
 app.set("view engine", "ejs");
 
 // Generate a random 6-character-long alphanumeric string
@@ -31,29 +35,16 @@ const generateRandomString = function() {
   return alphaNum;
 };
 
+// Object to contain shortened URLs with associated long URL and user ID
 const urlDatabase = {
-  "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "userRandomID" },
-  "9sm5xK": { longURL: "http://www.google.com", userID: "a22" }
 };
 
+// Object to contain user IDs and their associated ID (redundancy), email, and hashed password
 const users = {
-  "userRandomID": {
-    id: "userRandomID",
-    email: "user@example.com",
-    password: bcrypt.hashSync("purple-monkey-dinosaur", 10)
-  },
-  "user2RandomID": {
-    id: "user2RandomID",
-    email: "user2@example.com",
-    password: bcrypt.hashSync("dishwasher-funk", 10)
-  }
 };
 
+// Helper functions
 const { emailExists, getUserByEmail, urlsForUser } = require('./helpers');
-
-// app.get("/", (req, res) => {
-//   res.send("Hello!");
-// });
 
 // Render the main page of URLs
 app.get("/urls", (req, res) => {
@@ -110,12 +101,16 @@ app.get("/login", (req, res) => {
 
 // Create a new shortURL for a longURL
 app.post("/urls", (req, res) => {
-  const newShortURL = generateRandomString();
-  urlDatabase[newShortURL] = {
-    longURL: req.body.longURL,
-    userID: req.session.user_id
-  };
-  res.redirect(`/urls/${newShortURL}`);
+  if (!req.body.longURL) {
+    res.status(418).send('<h2>418 - I\'m a teapot. The URL field was left empty.</h2>');
+  } else {
+    const newShortURL = generateRandomString();
+    urlDatabase[newShortURL] = {
+      longURL: req.body.longURL,
+      userID: req.session.user_id
+    };
+    res.redirect(`/urls/${newShortURL}`);
+  }
 });
 
 // Delete existing shortURL: longURL
@@ -137,6 +132,8 @@ app.post("/urls/:shortURL/edit", (req, res) => {
 app.post("/urls/:id", (req, res) => {
   if (!urlDatabase[req.params.id]) {
     res.status(403).send('<h2>403 - Access is forbidden and the URL does not exist anyway</h2>');
+  } else if (!req.body.longURL) {
+    res.status(418).send('<h2>418 - I\'m a teapot. The URL field was left empty.</h2>');
   } else if (req.session.user_id === urlDatabase[req.params.id].userID) {
     urlDatabase[req.params.id].longURL = req.body.longURL;
     res.redirect("/urls");
@@ -192,14 +189,6 @@ app.post("/register", (req, res) => {
     res.redirect("urls");
   }
 });
-
-// app.get("/urls.json", (req, res) => {
-//   res.json(urlDatabase);
-// });
-
-// app.get("/hello", (req, res) => {
-//   res.send("<html><body>Hello <b>World</b></body></html>\n");
-// });
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
