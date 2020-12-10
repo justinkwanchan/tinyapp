@@ -180,3 +180,5 @@
     * Modify your existing getUserByEmail function (or create one) to take in the user's email and users database as parameters
 2. Create a Helper Functions Module
     * Put functions in here and export them
+3. Mocha and Chai
+    * Begin by testing getUserByEmail function
