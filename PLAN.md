@@ -160,4 +160,14 @@
 
 ## Switching to Encrypted Cookies
 
-1. 
+1. Install cookie-session middleware
+2. const app = express()
+```js
+  app.use(cookieSession({
+    name: 'session',
+    keys: [/* secret keys */],
+
+    // Cookie Options
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  }));
+```
