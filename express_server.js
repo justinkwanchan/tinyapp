@@ -14,6 +14,8 @@ app.use(bodyParser.urlencoded({extended: true}));
 const cookieParser = require('cookie-parser');
 app.use(cookieParser());
 
+const bcrypt = require('bcrypt');
+
 app.set("view engine", "ejs");
 
 // Generate a random 6-character-long alphanumeric string
@@ -32,16 +34,6 @@ const urlDatabase = {
 };
 
 const users = {
-  "userRandomID": {
-    id: "userRandomID",
-    email: "user@example.com",
-    password: "purple-monkey-dinosaur"
-  },
-  "a22": {
-    id: "a22",
-    email: "a@t.com",
-    password: "pass"
-  }
 };
 
 // Checks to see if given email exists in users object
@@ -176,7 +168,7 @@ app.post("/login", (req, res) => {
     res.status(400).send('<h2>400 - Email or password left empty</h2>');
   } else if (!emailExists(req.body.email)) {
     res.status(403).send('<h2>403 - Email does not exist</h2>');
-  } else if (users[userID].password !== req.body.password) {
+  } else if (!bcrypt.compareSync(req.body.password, users[userID].password)) {
     res.status(403).send('<h2>403 - Password does not match</h2>');
   } else {
     res.cookie('user_id', userID);
@@ -205,7 +197,7 @@ app.post("/register", (req, res) => {
     users[newID] = {
       id: newID,
       email: req.body.email,
-      password: req.body.password
+      password: bcrypt.hashSync(req.body.password, 10)
     };
     res.cookie('user_id', newID);
     res.redirect("urls");

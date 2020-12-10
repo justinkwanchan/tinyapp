@@ -149,3 +149,15 @@
 2. Users Can Only Edit or Delete Their Own URLs
     * Update the edit and delete endpoints
     * Use curl "-X POST -i localhost:8080/urls/sgq3y6/delete" to test
+
+## Storing Passwords Securely
+
+1. Use bcrypt When Storing Passwords
+    * /register
+2. Use bcrypt When Checking Passwords
+    * bcrypt.compareSync(inputPassword, savedHashedPassword)
+    * /login
+
+## Switching to Encrypted Cookies
+
+1. 
