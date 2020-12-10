@@ -44,15 +44,28 @@ const users = {
 };
 
 // Helper functions
-const { emailExists, getUserByEmail, urlsForUser } = require('./helpers');
+const { emailExists, getUserByEmail, urlsForUser, urlExists } = require('./helpers');
+
+// Index that redirects
+app.get("/", (req, res) => {
+  if (req.session.user_id) {
+    res.redirect("/urls");
+  } else {
+    res.redirect("/login");
+  }
+});
 
 // Render the main page of URLs
 app.get("/urls", (req, res) => {
-  const templateVars = {
-    urls: urlsForUser(req.session.user_id, urlDatabase),
-    user_id: users[req.session.user_id]
-  };
-  res.render("urls_index", templateVars);
+  if (req.session.user_id) {
+    const templateVars = {
+      urls: urlsForUser(req.session.user_id, urlDatabase),
+      user_id: users[req.session.user_id]
+    };
+    res.render("urls_index", templateVars);
+  } else {
+    res.redirect("/login");
+  }
 });
 
 // Render page for creating a new shortURL
@@ -69,12 +82,16 @@ app.get("/urls/new", (req, res) => {
 
 // Render page for the shortURL
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = {
-    shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL].longURL,
-    user_id: users[req.session.user_id]
-  };
-  res.render("urls_show", templateVars);
+  if (!urlExists(req.params.shortURL, urlDatabase)) {
+    res.status(418).send('<h2>418 - I\'m a teapot. The URL does not exist.</h2>');
+  } else {
+    const templateVars = {
+      shortURL: req.params.shortURL,
+      longURL: urlDatabase[req.params.shortURL].longURL,
+      user_id: users[req.session.user_id]
+    };
+    res.render("urls_show", templateVars);
+  }
 });
 
 // Redirect to actual webpage upon clicking on shortURL
@@ -189,6 +206,10 @@ app.post("/register", (req, res) => {
     res.redirect("urls");
   }
 });
+
+app.get("/json", (req,res) => {
+  res.send(urlDatabase);
+})
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);

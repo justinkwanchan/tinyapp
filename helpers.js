@@ -25,4 +25,9 @@ const urlsForUser = (id, database) => {
   return returnObj;
 };
 
-module.exports = { emailExists, getUserByEmail, urlsForUser };
+const urlExists = (url, database) => {
+  if (Object.keys(database).includes(url)) return true;
+  return false;
+};
+
+module.exports = { emailExists, getUserByEmail, urlsForUser, urlExists };
