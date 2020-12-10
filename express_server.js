@@ -44,7 +44,7 @@ const users = {
 };
 
 // Helper functions
-const { emailExists, getUserByEmail, urlsForUser, urlExists } = require('./helpers');
+const { emailExists, getUserByEmail, urlsForUser, urlExists, userOwnsURL } = require('./helpers');
 
 // Index that redirects
 app.get("/", (req, res) => {
@@ -84,6 +84,10 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   if (!urlExists(req.params.shortURL, urlDatabase)) {
     res.status(418).send('<h2>418 - I\'m a teapot. The URL does not exist.</h2>');
+  } else if (!req.session.user_id) {
+    res.status(403).send('<h2>403 - Access is forbidden</h2>');
+  } else if (!userOwnsURL(req.session.user_id, req.params.shortURL, urlDatabase)) {
+    res.status(403).send('<h2>403 - Forbidden - You do not own this short URL</h2>');
   } else {
     const templateVars = {
       shortURL: req.params.shortURL,
@@ -206,10 +210,6 @@ app.post("/register", (req, res) => {
     res.redirect("urls");
   }
 });
-
-app.get("/json", (req,res) => {
-  res.send(urlDatabase);
-})
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
