@@ -171,3 +171,12 @@
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
   }));
 ```
+3. Change all instances of cookies to session
+    * There is no session method to assign a session/cookie like with cookieParser, so just assign it
+
+## Testing Helper Functions
+
+1. Refactor Helper Functions
+    * Modify your existing getUserByEmail function (or create one) to take in the user's email and users database as parameters
+2. Create a Helper Functions Module
+    * Put functions in here and export them

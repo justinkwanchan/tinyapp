@@ -39,32 +39,7 @@ const urlDatabase = {
 const users = {
 };
 
-// Checks to see if given email exists in users object
-const emailExists = email => {
-  for (let user in users) {
-    if (users[user].email === email) return true;
-  }
-  return false;
-};
-
-// Returns the user's id associated with their email
-const idByEmail = email => {
-  for (let user in users) {
-    if (users[user].email === email) return users[user].id;
-  }
-  return null;
-};
-
-// Returns an object  containing only the URL objects associated with a particular user ID
-const urlsForUser = id => {
-  let returnObj = {};
-  for (let key in urlDatabase) {
-    if (urlDatabase[key].userID === id) {
-      returnObj[key] = urlDatabase[key];
-    }
-  }
-  return returnObj;
-};
+const { emailExists, getUserByEmail, urlsForUser } = require('./helpers');
 
 // app.get("/", (req, res) => {
 //   res.send("Hello!");
@@ -73,7 +48,7 @@ const urlsForUser = id => {
 // Render the main page of URLs
 app.get("/urls", (req, res) => {
   const templateVars = {
-    urls: urlsForUser(req.session.user_id),
+    urls: urlsForUser(req.session.user_id, urlDatabase),
     user_id: users[req.session.user_id]
   };
   res.render("urls_index", templateVars);
@@ -166,10 +141,10 @@ app.post("/urls/:id", (req, res) => {
  * Sends a response code of 403 if email exists and password does not match
  */
 app.post("/login", (req, res) => {
-  const userID = idByEmail(req.body.email);
+  const userID = getUserByEmail(req.body.email, users);
   if (!req.body.email || !req.body.password) {
     res.status(400).send('<h2>400 - Email or password left empty</h2>');
-  } else if (!emailExists(req.body.email)) {
+  } else if (!emailExists(req.body.email, users)) {
     res.status(403).send('<h2>403 - Email does not exist</h2>');
   } else if (!bcrypt.compareSync(req.body.password, users[userID].password)) {
     res.status(403).send('<h2>403 - Password does not match</h2>');
@@ -194,7 +169,7 @@ app.post("/logout", (req, res) => {
 app.post("/register", (req, res) => {
   if (!req.body.email || !req.body.password) {
     res.status(400).send('<h2>400 - Email or password left empty</h2>');
-  } else if (emailExists(req.body.email)) {
+  } else if (emailExists(req.body.email, users)) {
     res.status(400).send('<h2>400 - Email is taken</h2>');
   } else {
     const newID = generateRandomString();
