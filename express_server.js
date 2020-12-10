@@ -16,6 +16,7 @@ app.use(cookieParser());
 
 app.set("view engine", "ejs");
 
+// Generate a random 6-character-long alphanumeric string
 const generateRandomString = function() {
   const charStr = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
   let alphaNum = '';
@@ -142,8 +143,14 @@ app.post("/urls", (req, res) => {
 
 // Delete existing shortURL: longURL
 app.post("/urls/:shortURL/delete", (req, res) => {
-  delete urlDatabase[req.params.shortURL];
-  res.redirect("/urls");
+  if (!urlDatabase[req.params.shortURL]) {
+    res.status(403).send('<h2>403 - Access is forbidden and the URL does not exist anyway</h2>');
+  } else if (req.cookies.user_id === urlDatabase[req.params.shortURL].userID) {
+    delete urlDatabase[req.params.shortURL];
+    res.redirect("/urls");
+  } else {
+    res.status(403).send('<h2>403 - Access is forbidden</h2>');
+  }
 });
 
 // Redirect to shortURL page upon clicking Edit button from main URLs page
@@ -153,9 +160,9 @@ app.post("/urls/:shortURL/edit", (req, res) => {
 
 // Edit existing shortURL
 app.post("/urls/:id", (req, res) => {
-  console.log(req.cookies.user_id)
-  console.log(urlDatabase[req.params.id].userID)
-  if (req.cookies.user_id === urlDatabase[req.params.id].userID) {
+  if (!urlDatabase[req.params.id]) {
+    res.status(403).send('<h2>403 - Access is forbidden and the URL does not exist anyway</h2>');
+  } else if (req.cookies.user_id === urlDatabase[req.params.id].userID) {
     urlDatabase[req.params.id].longURL = req.body.longURL;
     res.redirect("/urls");
   } else {
