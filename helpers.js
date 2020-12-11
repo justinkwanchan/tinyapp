@@ -1,6 +1,16 @@
+// Generate a random 6-character-long alphanumeric string
+const generateRandomString = function() {
+  const charStr = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  let alphaNum = '';
+  for (let i = 0; i < 6; i++) {
+    alphaNum += charStr.charAt(Math.floor(Math.random() * charStr.length));
+  }
+  return alphaNum;
+};
+
 // Checks to see if given email exists in users object
 const emailExists = (email, database) => {
-  for (let user in database) {
+  for (const user in database) {
     if (database[user].email === email) return true;
   }
   return false;
@@ -8,7 +18,7 @@ const emailExists = (email, database) => {
 
 // Returns the user's id associated with their email
 const getUserByEmail = (email, database) => {
-  for (let user in database) {
+  for (const user in database) {
     if (database[user].email === email) return database[user].id;
   }
   return null;
@@ -17,7 +27,7 @@ const getUserByEmail = (email, database) => {
 // Returns an object  containing only the URL objects associated with a particular user ID
 const urlsForUser = (id, database) => {
   let returnObj = {};
-  for (let key in database) {
+  for (const key in database) {
     if (database[key].userID === id) {
       returnObj[key] = database[key];
     }
@@ -38,4 +48,4 @@ const userOwnsURL = (id, url, database) => {
   return false;
 };
 
-module.exports = { emailExists, getUserByEmail, urlsForUser, urlExists, userOwnsURL };
+module.exports = { generateRandomString, emailExists, getUserByEmail, urlsForUser, urlExists, userOwnsURL };

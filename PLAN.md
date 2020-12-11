@@ -165,10 +165,7 @@
 ```js
   app.use(cookieSession({
     name: 'session',
-    keys: [/* secret keys */],
-
-    // Cookie Options
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    keys: ['key1']
   }));
 ```
 3. Change all instances of cookies to session

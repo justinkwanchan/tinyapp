@@ -25,16 +25,6 @@ app.use(cookieSession({
 
 app.set("view engine", "ejs");
 
-// Generate a random 6-character-long alphanumeric string
-const generateRandomString = function() {
-  const charStr = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  let alphaNum = '';
-  for (let i = 0; i < 6; i++) {
-    alphaNum += charStr.charAt(Math.floor(Math.random() * charStr.length));
-  }
-  return alphaNum;
-};
-
 // Object to contain shortened URLs with associated long URL and user ID
 const urlDatabase = {
 };
@@ -44,7 +34,7 @@ const users = {
 };
 
 // Helper functions
-const { emailExists, getUserByEmail, urlsForUser, urlExists, userOwnsURL } = require('./helpers');
+const { generateRandomString, emailExists, getUserByEmail, urlsForUser, urlExists, userOwnsURL } = require('./helpers');
 
 // Index that redirects
 app.get("/", (req, res) => {
@@ -100,8 +90,12 @@ app.get("/urls/:shortURL", (req, res) => {
 
 // Redirect to actual webpage upon clicking on shortURL
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL].longURL;
-  res.redirect(longURL);
+  if (!urlDatabase[req.params.shortURL]) {
+    res.status(400).send('<h2>400 - URL does not exist</h2>');
+  } else {
+    const longURL = urlDatabase[req.params.shortURL].longURL;
+    res.redirect(longURL);
+  }
 });
 
 // Render the registration page
