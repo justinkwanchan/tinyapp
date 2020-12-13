@@ -48,6 +48,7 @@ const userOwnsURL = (id, url, database) => {
   return false;
 };
 
+// Returns the current date and time in a readable format
 const timeStamp = dateTime => {
   const [month, date, year]    = dateTime.toLocaleDateString("en-US").split("/");
   const [hour, minute, second] = dateTime.toLocaleTimeString("en-US").split(/:| /);
