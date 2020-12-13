@@ -31,36 +31,10 @@ app.use(methodOverride('_method'))
 
 // Object to contain shortened URLs with associated long URL and user ID
 const urlDatabase = {
-  "FFFODu": {
-    "longURL": "https://www.cbc.ca",
-    "userID": "vySu3e",
-    },
-  "khNv7a": {
-    "longURL": "https://www.youtube.com",
-    "userID": "vySu3e"
-    },
-  "PJy6Ry": {
-    "longURL": "http://www.facebook.com",
-    "userID": "9cJp50"
-    },
-  "orpqEs": {
-    "longURL": "geocities.com",
-    "userID": "9cJp50"
-    }
 };
 
 // Object to contain user IDs and their associated ID (redundancy), email, and hashed password
 const users = {
-  "vySu3e": {
-    "id": "vySu3e",
-    "email": "a@t.com",
-    "password": "$2b$10$jzT/0g8O2bOkeXHVrUfQ0eQOnZwev3HOgI2EvnWkqQJRjr2tVeQI2"
-    },
-    "9cJp50": {
-    "id": "9cJp50",
-    "email": "a@w.com",
-    "password": "$2b$10$NxfVaECliyebzW2oCge6f.nQXz5eH0gIdOg.odjoG7SnUhEJjTHkO"
-    }
 };
 
 // Helper functions
@@ -122,10 +96,14 @@ app.get("/urls/:shortURL", (req, res) => {
   } else if (!userOwnsURL(req.session.user_id, req.params.shortURL, urlDatabase)) {
     res.status(403).send('<h2>403 - Forbidden - You do not own this short URL</h2>');
   } else {
+    const url = urlDatabase[req.params.shortURL];
     const templateVars = {
       shortURL: req.params.shortURL,
-      longURL: urlDatabase[req.params.shortURL].longURL,
-      user_id: users[req.session.user_id]
+      longURL: url.longURL,
+      user_id: users[req.session.user_id],
+      visits: url.visits,
+      uniqueVisits: (url.uniqueVisits || []).length,
+      visitData: url.visitData,
     };
     res.render("urls_show", templateVars);
   }
@@ -260,14 +238,6 @@ app.post("/register", (req, res) => {
     req.session.user_id = newID;
     res.redirect("urls");
   }
-});
-
-app.get("/urldb", (req, res) => {
-  res.send(urlDatabase);
-});
-
-app.get("/users", (req, res) => {
-  res.send(users);
 });
 
 app.listen(PORT, () => {

@@ -7,14 +7,16 @@
 </head>
 
 <body>
+
   <%- include('partials/_header') %>
+
   <div class="card text-center">
-      <div class="card-header"></div>
-      <div class="card-body">
-        <h5 class="card-title">TinyURL for: <%= longURL %></h5>
-        <p class="card-text">Short URL: <a href="/u/<%= shortURL %>"><%= shortURL %></a></p>
-      </div>
-    <div class="card-footer text-muted">
+    <div class="card-header"></div>
+    <div class="card-body">
+      <h5 class="card-title">TinyURL for: <%= longURL %></h5>
+      <p class="card-text">Short URL: <a href="/u/<%= shortURL %>"><%= shortURL %></a></p>
+    </div>
+    <div class="card-header card-footer text-muted">
       <!--################## EDIT EXISTING URL ##################-->
       <h1><strong>Edit</strong></h1>
       <form class="form-inline row justify-content-center" action="/urls/<%= shortURL %>?_method=PUT" method="POST">
@@ -24,6 +26,31 @@
           <button type="submit" class="btn btn-primary">Submit</button>
         </div>
       </form>
+    </div>
+    
+    <div class="card-body row justify-content-center">
+      <div style="width: 100%">
+        <p class="mb-0 mt-2">Total Visits: <%= visits || 0 %></p>
+        <p>Total Unique Visits: <%= uniqueVisits || 0 %></p>
+      </div>
+      <% if (visitData) { %>
+        <table class="table mt-2" style="width: auto">
+          <thead>
+            <tr>
+              <th scope="col" class="px-4">Visitor ID</th>
+              <th scope="col" class="px-4">Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% for(let i = 0; i < visitData.timestamp.length; i++) { %>
+              <tr>
+                <td class="px-4"><%= visitData.visitorID[i]%></td>
+                <td class="px-4"><%= visitData.timestamp[i]%></td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      <% } %>
     </div>
   </div>
   <!-- Bootstrap JS -->
