@@ -12,18 +12,22 @@
 const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
-const bcrypt = require('bcrypt');
-
 const bodyParser = require("body-parser");
+const bcrypt = require('bcrypt');
+const cookieSession = require('cookie-session');
+const methodOverride = require('method-override')
+
+app.set("view engine", "ejs");
+
 app.use(bodyParser.urlencoded({extended: true}));
 
-const cookieSession = require('cookie-session');
 app.use(cookieSession({
   name: 'session',
   keys: ['key1']
 }));
 
-app.set("view engine", "ejs");
+app.use(methodOverride('_method'))
+
 
 // Object to contain shortened URLs with associated long URL and user ID
 const urlDatabase = {
@@ -70,6 +74,11 @@ app.get("/urls/new", (req, res) => {
   }
 });
 
+// Redirect to shortURL page upon clicking Edit button from main URLs page
+app.get("/urls/:shortURL/edit", (req, res) => {
+  res.redirect(`/urls/${req.params.shortURL}`);
+});
+ 
 // Render page for the shortURL
 app.get("/urls/:shortURL", (req, res) => {
   if (!urlExists(req.params.shortURL, urlDatabase)) {
@@ -129,7 +138,7 @@ app.post("/urls", (req, res) => {
 });
 
 // Delete existing shortURL: longURL
-app.post("/urls/:shortURL/delete", (req, res) => {
+app.delete("/urls/:shortURL/delete", (req, res) => {
   if (req.session.user_id === urlDatabase[req.params.shortURL].userID) {
     delete urlDatabase[req.params.shortURL];
     res.redirect("/urls");
@@ -138,13 +147,8 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   }
 });
 
-// Redirect to shortURL page upon clicking Edit button from main URLs page
-app.post("/urls/:shortURL/edit", (req, res) => {
-  res.redirect(`/urls/${req.params.shortURL}`);
-});
-
 // Edit existing shortURL
-app.post("/urls/:id", (req, res) => {
+app.put("/urls/:id", (req, res) => {
   if (!urlDatabase[req.params.id]) {
     res.status(403).send('<h2>403 - Access is forbidden and the URL does not exist anyway</h2>');
   } else if (!req.body.longURL) {
