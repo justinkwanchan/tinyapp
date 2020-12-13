@@ -35,7 +35,7 @@ const urlDatabase = {
     "longURL": "https://www.cbc.ca",
     "userID": "vySu3e",
     visits: 0,
-    uniqueVisits: 0,
+    uniqueVisits: [],
     timestamp: null,
     visitorID: undefined
     },
@@ -129,15 +129,22 @@ app.get("/urls/:shortURL", (req, res) => {
 
 // Redirect to actual webpage upon clicking on shortURL
 app.get("/u/:shortURL", (req, res) => {
-  if (!urlDatabase[req.params.shortURL]) {
+  const clickedURL = urlDatabase[req.params.shortURL];
+  if (!clickedURL) {
     res.status(400).send('<h2>400 - URL does not exist</h2>');
   } else {
     // Add total amount of clicks for link
-    urlDatabase[req.params.shortURL].visits = urlDatabase[req.params.shortURL].visits + 1 || 1;
-    if (req.session.user_id) {
+    clickedURL.visits = clickedURL.visits + 1 || 1;
 
+    // Add all unique visitors who click link
+    if (req.session.user_id) {
+      if (!clickedURL.uniqueVisits) clickedURL.uniqueVisits = [];
+      if (!clickedURL.uniqueVisits.includes(req.session.user_id)) {
+        clickedURL.uniqueVisits.push(req.session.user_id);
+      }
     }
-    const longURL = urlDatabase[req.params.shortURL].longURL;
+
+    const longURL = clickedURL.longURL;
     res.redirect(longURL);
   }
 });
