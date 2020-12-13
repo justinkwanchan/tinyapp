@@ -31,10 +31,40 @@ app.use(methodOverride('_method'))
 
 // Object to contain shortened URLs with associated long URL and user ID
 const urlDatabase = {
+  "FFFODu": {
+    "longURL": "https://www.cbc.ca",
+    "userID": "vySu3e",
+    visits: 0,
+    uniqueVisits: 0,
+    timestamp: null,
+    visitorID: undefined
+    },
+  "khNv7a": {
+    "longURL": "https://www.youtube.com",
+    "userID": "vySu3e"
+    },
+  "PJy6Ry": {
+    "longURL": "http://www.facebook.com",
+    "userID": "9cJp50"
+    },
+  "orpqEs": {
+    "longURL": "geocities.com",
+    "userID": "9cJp50"
+    }
 };
 
 // Object to contain user IDs and their associated ID (redundancy), email, and hashed password
 const users = {
+  "vySu3e": {
+    "id": "vySu3e",
+    "email": "a@t.com",
+    "password": "$2b$10$jzT/0g8O2bOkeXHVrUfQ0eQOnZwev3HOgI2EvnWkqQJRjr2tVeQI2"
+    },
+    "9cJp50": {
+    "id": "9cJp50",
+    "email": "a@w.com",
+    "password": "$2b$10$NxfVaECliyebzW2oCge6f.nQXz5eH0gIdOg.odjoG7SnUhEJjTHkO"
+    }
 };
 
 // Helper functions
@@ -102,6 +132,11 @@ app.get("/u/:shortURL", (req, res) => {
   if (!urlDatabase[req.params.shortURL]) {
     res.status(400).send('<h2>400 - URL does not exist</h2>');
   } else {
+    // Add total amount of clicks for link
+    urlDatabase[req.params.shortURL].visits = urlDatabase[req.params.shortURL].visits + 1 || 1;
+    if (req.session.user_id) {
+
+    }
     const longURL = urlDatabase[req.params.shortURL].longURL;
     res.redirect(longURL);
   }
@@ -207,6 +242,14 @@ app.post("/register", (req, res) => {
     req.session.user_id = newID;
     res.redirect("urls");
   }
+});
+
+app.get("/urldb", (req, res) => {
+  res.send(urlDatabase);
+});
+
+app.get("/users", (req, res) => {
+  res.send(users);
 });
 
 app.listen(PORT, () => {

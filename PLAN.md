@@ -181,3 +181,13 @@
     * Begin by testing getUserByEmail function
       * Test the happy path
       * Test to see that the function returns undefined if the email is nonexistent
+
+## Analytics
+
+1. Keep track of how many times a given short URL is visited and display it on the edit page for the url
+    * visits
+2. Keep track of how many UNIQUE visitors visit each url (set a cookie to track of distinct users), display this along side the total visitors number
+    * uniqueVisits
+3. Keep track of every visit (timestamp, and a generated visitor_id) and display the list on the URL edit page
+    * timestamp
+    * visitorID
