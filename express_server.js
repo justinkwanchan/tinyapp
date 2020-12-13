@@ -34,10 +34,6 @@ const urlDatabase = {
   "FFFODu": {
     "longURL": "https://www.cbc.ca",
     "userID": "vySu3e",
-    visits: 0,
-    uniqueVisits: [],
-    timestamp: null,
-    visitorID: undefined
     },
   "khNv7a": {
     "longURL": "https://www.youtube.com",
@@ -68,7 +64,15 @@ const users = {
 };
 
 // Helper functions
-const { generateRandomString, emailExists, getUserByEmail, urlsForUser, urlExists, userOwnsURL } = require('./helpers');
+const {
+  generateRandomString,
+  emailExists,
+  getUserByEmail,
+  urlsForUser,
+  urlExists,
+  userOwnsURL,
+  timeStamp
+} = require('./helpers');
 
 // Index that redirects
 app.get("/", (req, res) => {
@@ -143,6 +147,13 @@ app.get("/u/:shortURL", (req, res) => {
         clickedURL.uniqueVisits.push(req.session.user_id);
       }
     }
+
+    // Add time and unique visitor ID for each click
+    clickedURL.visitData = clickedURL.visitData || {};
+    (clickedURL.visitData.timestamp = clickedURL.visitData.timestamp || [])
+      .push(timeStamp(new Date()));
+    (clickedURL.visitData.visitorID = clickedURL.visitData.visitorID || [])
+      .push(generateRandomString());
 
     const longURL = clickedURL.longURL;
     res.redirect(longURL);

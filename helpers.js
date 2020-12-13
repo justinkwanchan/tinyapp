@@ -48,4 +48,10 @@ const userOwnsURL = (id, url, database) => {
   return false;
 };
 
-module.exports = { generateRandomString, emailExists, getUserByEmail, urlsForUser, urlExists, userOwnsURL };
+const timeStamp = dateTime => {
+  const [month, date, year]    = dateTime.toLocaleDateString("en-US").split("/");
+  const [hour, minute, second] = dateTime.toLocaleTimeString("en-US").split(/:| /);
+  return (`${year}-${month}-${date} ${hour}:${minute}:${second}`);
+}
+
+module.exports = { generateRandomString, emailExists, getUserByEmail, urlsForUser, urlExists, userOwnsURL, timeStamp };
